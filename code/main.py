@@ -23,22 +23,22 @@ import logging
 from docx import Document
 import pdb
 
-@app.route("/v1/save", methods=["POST", "GET"])
-def save():
-    # content = request.files['content']
-    # fname = content.read()
-    f = open('ff.docx','rb')
-    dat = f.read()
-    binary = psycopg2.Binary(dat)
-    connection = get_db()
-    cursor = connection.cursor()
-    cursor.execute("INSERT INTO save (file) VALUES (%s)", (binary,))
-    cursor.close()
-    connection.commit()
-    return 'success'
-# pdb.set_trace()
-@app.route("/v1/take", methods=["POST", "GET"])
-def take():
+# @app.route("/v1/save", methods=["POST", "GET"])      #------------------To save file in db------------------------#
+# def save():
+#     # content = request.files['content']
+#     # fname = content.read()
+#     f = open('ff.docx','rb')
+#     dat = f.read()
+#     binary = psycopg2.Binary(dat)
+#     connection = get_db()
+#     cursor = connection.cursor()
+#     cursor.execute("INSERT INTO save (file) VALUES (%s)", (binary,))
+#     cursor.close()
+#     connection.commit()
+#     return 'success'
+
+@app.route("/v1/file", methods=["POST", "GET"])           #------------------To fetch file from db------------------------#
+def file():
     source_id = 1
     connection = get_db()
     cursor = connection.cursor()
@@ -48,7 +48,7 @@ def take():
     cursor.close()
     return 'done'
 
-@app.route("/v1/source_word", methods=["POST", "GET"])
+@app.route("/v1/source", methods=["POST", "GET"])
 # @check_token
 def source_word():
     content = request.files['source_file']
@@ -91,15 +91,13 @@ def source_word():
             os.remove(filename)
         return '{"success":false, "message":"File has been uploaded successfully"}'
 
-        # pdb.set_trace()
-
-@app.route("/v1/get_wordtokens", methods=["POST", "GET"])
+@app.route("/v1/downloadtokens", methods=["POST", "GET"])               #------------------download tokens in excel file------------------------#
 # @check_token
-def other_wordtokens():
-    language = 'eng'#request.form["language"]
-    name = 'test1'#request.form["name"]
-    file_type = 'docx'#request.form["file_type"]
-    targetlang = 'tam'#request.form["targetlang"]
+def downloadtokens():
+    language = request.form["language"]
+    name = request.form["name"]
+    file_type = request.form["file_type"]
+    targetlang = request.form["targetlang"]
     connection = get_db()
     cursor = connection.cursor()
     cursor.execute("SELECT id FROM other_sources WHERE language = %s AND name = %s AND file_type = %s ", (language, name, file_type))
@@ -129,9 +127,9 @@ def other_wordtokens():
             output.headers["Content-type"] = "xlsx"
             return output
 
-@app.route("/v1/other_uploadtokentranslation", methods=["POST"])
+@app.route("/v1/uploadtokentranslation", methods=["POST"])                         #------------------To upload token translation in database via excel file------------------------#
 # @check_token
-def other_upload_tokens_translation():
+def upload_tokens_translation():
     language = request.form["language"]
     name = request.form["name"]
     file_type = request.form["file_type"]
@@ -197,13 +195,13 @@ def other_upload_tokens_translation():
         return '{"success":false, "message":"Tokens have no translation"}'
 
 
-@app.route("/v1/other_translations", methods=["POST","GET"])
+@app.route("/v1/translations", methods=["POST", "GET"])         #------------------download translation draft in docx file------------------------#
 # @check_token
-def othr():
-    language = 'eng'#request.form["language"]
-    name = 'test1'#request.form["name"]
-    file_type = 'docx'#request.form["file_type"]
-    targetlang = 'tam'#request.form["targetlang"]
+def translationdraft():
+    language = request.form["language"]
+    name = request.form["name"]
+    file_type = request.form["file_type"]
+    targetlang = request.form["targetlang"]
     changes = []
     changes1 = []
     connection = get_db()
@@ -241,8 +239,8 @@ def othr():
         doc.save('dest1.docx')
         return 'done'
 
-@app.route("/v1/ss", methods=["POST", "GET"])
-def ss():
+@app.route("/v1/testing", methods=["POST", "GET"])
+def testing():
     doc = Document('ff.docx')
     dic = {'old' : "new", 'boy' : "girl", 'pen' : "pensil"}
     for p in doc.paragraphs:
