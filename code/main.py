@@ -23,32 +23,8 @@ import logging
 from docx import Document
 import pdb
 
-# @app.route("/v1/save", methods=["POST", "GET"])      #------------------To save file in db------------------------#
-# def save():
-#     # content = request.files['content']
-#     # fname = content.read()
-#     f = open('ff.docx','rb')
-#     dat = f.read()
-#     binary = psycopg2.Binary(dat)
-#     connection = get_db()
-#     cursor = connection.cursor()
-#     cursor.execute("INSERT INTO save (file) VALUES (%s)", (binary,))
-#     cursor.close()
-#     connection.commit()
-#     return 'success'
 
-@app.route("/v1/file", methods=["POST", "GET"])           #------------------To fetch file from db------------------------#
-def file():
-    source_id = 1
-    connection = get_db()
-    cursor = connection.cursor()
-    cursor.execute("SELECT  file FROM other_sources WHERE id = %s ", (source_id,))
-    file1 = cursor.fetchone()
-    open("file.docx", 'wb').write(file1[0])
-    cursor.close()
-    return 'done'
-
-@app.route("/v1/source", methods=["POST", "GET"])
+@app.route("/v1/source", methods=["POST", "GET"])           #--------------To save source file in db, generate token and save it in db------------------------#
 # @check_token
 def source_word():
     content = request.files['source_file']
@@ -186,10 +162,8 @@ def upload_tokens_translation():
             if os.path.exists(filename):
                 os.remove(filename)
         if changes:
-            # logging.warning('User \'' + str(request.email) + '\' uploaded translation of tokens successfully')
             return '{"success":true, "message":"Token translation have been uploaded successfully"}'
         else:
-            # logging.warning('User \'' + str(request.email) + '\' upload of token translation unsuccessfully')
             return '{"success":false, "message":"No Changes. Existing token is already up-to-date."}'
     else:
         return '{"success":false, "message":"Tokens have no translation"}'
@@ -239,6 +213,9 @@ def translationdraft():
         doc.save('dest1.docx')
         return 'done'
 
+#--------------------------------------------------------------------------------|| TESTING ||-------------------------------------------------------------------------------#
+        # below API's are creatred only for testing #
+
 @app.route("/v1/testing", methods=["POST", "GET"])
 def testing():
     doc = Document('ff.docx')
@@ -253,3 +230,28 @@ def testing():
                         inline[i].text = text
     doc.save('dest1.docx')
     return '1'
+
+@app.route("/v1/save", methods=["POST", "GET"])      #------------------To save file in db------------------------#
+def save():
+    # content = request.files['content']
+    # fname = content.read()
+    f = open('ff.docx','rb')
+    dat = f.read()
+    binary = psycopg2.Binary(dat)
+    connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO save (file) VALUES (%s)", (binary,))
+    cursor.close()
+    connection.commit()
+    return 'success'
+
+    @app.route("/v1/file", methods=["POST", "GET"])           #------------------To fetch file from db------------------------#
+    def file():
+        source_id = 1
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute("SELECT  file FROM other_sources WHERE id = %s ", (source_id,))
+        file1 = cursor.fetchone()
+        open("file.docx", 'wb').write(file1[0])
+        cursor.close()
+        return 'done'
