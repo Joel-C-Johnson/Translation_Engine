@@ -67,6 +67,7 @@ def source_word():
             os.remove(filename)
         return '{"success":false, "message":"File has been uploaded successfully"}'
 
+
 @app.route("/v1/downloadtokens", methods=["POST", "GET"])               #------------------download tokens in excel file------------------------#
 # @check_token
 def downloadtokens():
@@ -103,7 +104,8 @@ def downloadtokens():
             output.headers["Content-type"] = "xlsx"
             return output
 
-@app.route("/v1/uploadtokentranslation", methods=["POST"])                         #------------------To upload token translation in database via excel file------------------------#
+
+@app.route("/v1/uploadtokentranslation", methods=["POST"])                #------------------To upload token translation in database via excel file------------------------#
 # @check_token
 def upload_tokens_translation():
     language = request.form["language"]
@@ -213,8 +215,8 @@ def translationdraft():
         doc.save('dest1.docx')
         return 'done'
 
-#--------------------------------------------------------------------------------|| TESTING ||-------------------------------------------------------------------------------#
-        # below API's are creatred only for testing #
+#-------------------------------------------|| TESTING ||-------------------------------------------------#
+                                    # below API's are creatred only for testing #
 
 @app.route("/v1/testing", methods=["POST", "GET"])
 def testing():
